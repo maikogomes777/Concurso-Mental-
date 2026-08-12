@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CONCURSO://ZERO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0E0C;
+    --panel:#14181A;
+    --panel2:#1D2422;
+    --line:#2A322E;
+    --gold:#D9A93B;
+    --green:#35D07F;
+    --red:#E5484D;
+    --text:#EDEDE5;
+    --dim:#8B948C;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:'IBM Plex Mono', monospace;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .display{font-family:'Bebas Neue', sans-serif; letter-spacing:0.03em;}
+  #app{max-width:520px; margin:0 auto; padding:16px 16px 60px; min-height:100vh;}
+
+  /* ---------- LOGIN / GATE ---------- */
+  #gate{
+    position:fixed; inset:0; background:var(--bg); z-index:50;
+    display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .gate-card{
+    width:100%; max-width:380px; background:var(--panel);
+    border:1px solid var(--line); border-radius:4px; padding:28px 24px;
+  }
+  .gate-card h1{font-family:'Bebas Neue'; font-size:32px; letter-spacing:0.04em; color:var(--gold); margin:0 0 4px;}
+  .gate-card p.sub{color:var(--dim); font-size:12.5px; margin:0 0 22px; line-height:1.5;}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:6px;}
+  .field input{
+    width:100%; background:var(--bg); border:1px solid var(--line); color:var(--text);
+    padding:11px 12px; border-radius:3px; font-family:inherit; font-size:14px;
+  }
+  .field input:focus{outline:none; border-color:var(--gold);}
+  .btn{
+    width:100%; padding:12px; border-radius:3px; border:none; font-family:'Bebas Neue';
+    font-size:16px; letter-spacing:0.05em; cursor:pointer; margin-top:6px;
+  }
+  .btn-primary{background:var(--gold); color:#1a1400;}
+  .btn-ghost{background:transparent; color:var(--dim); border:1px solid var(--line);}
+  .btn-danger{background:var(--red); color:#fff;}
+  .gate-msg{font-size:11.5px; color:var(--red); margin-top:8px; min-height:14px;}
+  .gate-switch{text-align:center; margin-top:16px; font-size:11.5px; color:var(--dim);}
+  .gate-switch a{color:var(--green); text-decoration:none; cursor:pointer;}
+
+  /* ---------- HEADER ---------- */
+  header{display:flex; justify-content:space-between; align-items:center; padding:14px 0 10px;}
+  .brand{font-family:'Bebas Neue'; font-size:22px; letter-spacing:0.05em;}
+  .brand span{color:var(--green);}
+  .streak{font-size:12px; color:var(--gold); display:flex; align-items:center; gap:4px;}
+
+  /* ---------- PAYSLIP (signature element) ---------- */
+  .payslip{
+    position:relative; background:var(--panel);
+    border:1px solid var(--line); border-radius:4px; padding:20px 18px 18px; margin-bottom:14px;
+    background-image: radial-gradient(circle, var(--bg) 2.5px, transparent 2.5px);
+    background-size: 14px 14px; background-position: -7px 0;
+    background-repeat: repeat-x; background-position-y: bottom;
+  }
+  .payslip-inner{background:var(--panel); padding-bottom:6px;}
+  .payslip-top{display:flex; justify-content:space-between; font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:0.05em; border-bottom:1px dashed var(--line); padding-bottom:10px; margin-bottom:12px;}
+  .payslip-title{font-family:'Bebas Neue'; font-size:13px; color:var(--dim); letter-spacing:0.08em;}
+  .payslip-name{font-size:15px; font-weight:600; margin-bottom:2px;}
+  .payslip-role{font-size:11.5px; color:var(--dim); margin-bottom:14px;}
+  .salary-row{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px;}
+  .salary-label{font-size:11px; color:var(--dim); text-transform:uppercase;}
+  .salary-value{font-family:'Bebas Neue'; font-size:38px; color:var(--green); line-height:1;}
+  .breakdown{display:flex; gap:10px; margin-top:10px;}
+  .chip-stat{flex:1; background:var(--panel2); border-radius:3px; padding:8px 10px; text-align:center;}
+  .chip-stat .n{font-family:'Bebas Neue'; font-size:18px;}
+  .chip-stat .l{font-size:9.5px; color:var(--dim); text-transform:uppercase; letter-spacing:0.04em;}
+  .stamp{
+    position:absolute; top:16px; right:16px; border:2px solid var(--gold); color:var(--gold);
+    border-radius:50%; width:64px; height:64px; display:flex; align-items:center; justify-content:center;
+    text-align:center; font-family:'Bebas Neue'; font-size:9.5px; line-height:1.05; transform:rotate(12deg);
+    letter-spacing:0.02em; padding:4px;
+  }
+
+  /* ---------- MOTIVATION BANNER ---------- */
+  .motivation{
+    background:var(--panel2); border-left:3px solid var(--gold); border-radius:3px;
+    padding:12px 14px; font-size:13px; line-height:1.5; margin-bottom:16px; color:#F2E7C9;
+  }
+
+  /* ---------- TABS ---------- */
+  .tabs{display:flex; gap:6px; margin-bottom:14px; overflow-x:auto;}
+  .tab{
+    padding:8px 14px; border-radius:20px; background:var(--panel); border:1px solid var(--line);
+    color:var(--dim); font-size:12px; white-space:nowrap; cursor:pointer;
+  }
+  .tab.active{background:var(--green); color:#04160D; border-color:var(--green); font-weight:600;}
+
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:4px; padding:16px; margin-bottom:12px;}
+  .section-title{font-family:'Bebas Neue'; font-size:18px; letter-spacing:0.03em; color:var(--gold); margin:0 0 10px;}
+
+  /* level chips */
+  .level-row{display:flex; gap:6px; margin-bottom:14px;}
+  .lvl{flex:1; text-align:center; padding:9px 4px; border-radius:3px; background:var(--panel2); border:1px solid var(--line); font-size:11px; cursor:pointer; color:var(--dim);}
+  .lvl.active{border-color:var(--green); color:var(--green);}
+  .lvl small{display:block; font-size:9px; opacity:0.7;}
+
+  .q-enunciado{font-size:14px; line-height:1.6; margin-bottom:12px;}
+  .q-original{background:var(--panel2); border-radius:3px; padding:10px 12px; font-size:12.5px; color:var(--dim); margin-bottom:10px; font-style:italic;}
+  .opt-list{display:flex; flex-direction:column; gap:8px;}
+  .opt{
+    text-align:left; padding:11px 13px; border-radius:3px; border:1px solid var(--line);
+    background:var(--panel2); color:var(--text); font-family:inherit; font-size:13px; cursor:pointer;
+  }
+  .opt.correct{border-color:var(--green); background:rgba(53,208,127,0.12); color:var(--green);}
+  .opt.wrong{border-color:var(--red); background:rgba(229,72,77,0.12); color:var(--red);}
+  .feedback{margin-top:12px; padding:11px 12px; border-radius:3px; font-size:12.5px; line-height:1.5;}
+  .feedback.ok{background:rgba(53,208,127,0.1); color:var(--green); border:1px solid rgba(53,208,127,0.3);}
+  .feedback.bad{background:rgba(229,72,77,0.1); color:var(--red); border:1px solid rgba(229,72,77,0.3);}
+  .next-btn{margin-top:12px;}
+
+  /* memory game */
+  .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px;}
+  .mcard{
+    aspect-ratio:1; background:var(--panel2); border:1px solid var(--line); border-radius:4px;
+    display:flex; align-items:center; justify-content:center; text-align:center; font-size:10.5px;
+    padding:6px; cursor:pointer; line-height:1.3;
+  }
+  .mcard.flipped{background:var(--gold); color:#1a1400; border-color:var(--gold);}
+  .mcard.matched{background:rgba(53,208,127,0.15); color:var(--green); border-color:var(--green); cursor:default;}
+  .mcard.hidden-face{color:var(--dim); font-family:'Bebas Neue'; font-size:20px;}
+
+  /* admin */
+  textarea{
+    width:100%; background:var(--bg); border:1px solid var(--line); color:var(--text);
+    padding:10px; border-radius:3px; font-family:inherit; font-size:12.5px; resize:vertical;
+  }
+  select{
+    width:100%; background:var(--bg); border:1px solid var(--line); color:var(--text);
+    padding:9px 10px; border-radius:3px; font-family:inherit; font-size:13px; margin-bottom:10px;
+  }
+  .qlist-item{border-bottom:1px solid var(--line); padding:10px 0; font-size:12px;}
+  .qlist-item .meta{color:var(--dim); font-size:10.5px; margin-bottom:4px;}
+  .row-btns{display:flex; gap:8px; margin-top:6px;}
+  .row-btns button{flex:1; padding:6px; font-size:10.5px; border-radius:3px; border:1px solid var(--line); background:var(--panel2); color:var(--dim); cursor:pointer;}
+  .footer-credit{text-align:center; color:var(--dim); font-size:10.5px; margin-top:24px; letter-spacing:0.03em;}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-card" id="gateCard"></div>
+</div>
+
+<div id="app" style="display:none;">
+  <header>
+    <div class="brand">CONCURSO<span>://</span>ZERO</div>
+    <div class="streak" id="streakDisplay">🔥 0 dias</div>
+  </header>
+
+  <div class="payslip">
+    <div class="payslip-inner">
+      <div class="stamp" id="stampBadge">LASCADO</div>
+      <div class="payslip-top">
+        <span class="payslip-title">Contracheque de Estudo</span>
+        <span id="payslipDate"></span>
+      </div>
+      <div class="payslip-name" id="payslipName">Candidato(a)</div>
+      <div class="payslip-role">Cargo pretendido: <span id="payslipRole">a definir</span></div>
+      <div class="salary-row">
+        <span class="salary-label">Salário acumulado</span>
+      </div>
+      <div class="salary-value" id="salaryValue">R$ 0,00</div>
+      <div class="breakdown">
+        <div class="chip-stat"><div class="n" id="statQuestions">0</div><div class="l">questões</div></div>
+        <div class="chip-stat"><div class="n" id="statAcertos">0%</div><div class="l">acerto</div></div>
+        <div class="chip-stat"><div class="n" id="statEnergia">0</div><div class="l">energia</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="motivation" id="motivationBox">Carregando...</div>
+
+  <div class="tabs" id="tabBar"></div>
+  <div id="tabContent"></div>
+
+  <div class="footer-credit">Desenvolvido por Maiko Gomes de Almeida</div>
+</div>
+
+<script>
+/* ============ DADOS PADRÃO ============ */
+const LEVEL_LABELS = [
+  {min:0, max:999, title:"LASCADO"},
+  {min:1000, max:2999, title:"MEIA BOCA"},
+  {min:3000, max:6999, title:"MALANDRO"},
+  {min:7000, max:14999, title:"VOCÊ É INTELIGENTE"},
+  {min:15000, max:Infinity, title:"VOCÊ ZEROU A VIDA"}
+];
+
+const DEFAULT_PHRASES = {
+  start: "Hoje você tá zerado, mas sabe de uma coisa? Zerado é diferente de parado. Você começou — isso já separa você de 90% dos cara que só falam que vão estudar um dia.",
+  tiers: [
+    {at:1518, msg:"Você bateu 1 salário mínimo simbólico. Mas olha na cara: isso não paga aluguel decente, não paga imprevisto. Bora pra 2."},
+    {at:3036, msg:"2 salários já é outra pegada, mas ainda é sobrevivência. Você tá aqui pra sobreviver ou pra viver bem? Próxima meta: 3."},
+    {at:4554, msg:"Com 3, já começa a sobrar pra guardar, pra respirar. Você já provou que consegue — a pergunta agora é até onde."},
+    {at:10000, msg:"Isso aqui não é mais sobre estudar. É sobre virar outra pessoa. O você de 6 meses atrás nem imaginava chegar aqui."}
+  ],
+  daily: "Não tenha pressa, mas não perca tempo. Cada dia parado é como esquecer o que você já aprendeu.",
+  streakBroken: "Sua sequência quebrou. Não é o fim — é só o momento de decidir se hoje é dia de voltar."
+};
+
+const DEFAULT_QUESTIONS = [
+  // NÍVEL 0 - aquecimento (flashcard)
+  {id:"q1", nivel:0, tipo:"flash", enunciado:"Reescritura de texto avalia principalmente se duas frases mantêm o mesmo ___ ao mudar a estrutura.", resposta:"sentido", peso:0.2},
+  {id:"q2", nivel:0, tipo:"flash", enunciado:"Ao trocar voz ativa por voz passiva, o sujeito da ativa vira o ___ da passiva.", resposta:"agente da passiva", peso:0.2},
+  {id:"q3", nivel:0, tipo:"flash", enunciado:"Numa reescritura correta, pode-se mudar a estrutura da frase, mas nunca o ___ original.", resposta:"sentido / significado", peso:0.2},
+
+  // NÍVEL 1 - certo/errado literal
+  {id:"q4", nivel:1, tipo:"certo_errado", original:"O prefeito sancionou a lei ontem.", enunciado:"A reescritura \"A lei foi sancionada pelo prefeito ontem\" preserva o sentido da frase original.", gabarito:true, justificativa:"Correto: é apenas a transformação de voz ativa para voz passiva, sem perda de sentido.", peso:0.5},
+  {id:"q5", nivel:1, tipo:"certo_errado", original:"Todos os candidatos aprovados serão nomeados em até 60 dias.", enunciado:"A reescritura \"Em até 60 dias, serão nomeados todos os candidatos que forem aprovados\" mantém o mesmo sentido.", gabarito:true, justificativa:"Correto: apenas a ordem das informações mudou, o sentido continua o mesmo.", peso:0.5},
+
+  // NÍVEL 2 - certo/errado com pegadinha
+  {id:"q6", nivel:2, tipo:"certo_errado", original:"Somente os aprovados no cadastro de reserva serão convocados, caso haja vacância.", enunciado:"A reescritura \"Os aprovados no cadastro de reserva serão sempre convocados, independentemente de haver vacância\" preserva o sentido original.", gabarito:false, justificativa:"Errado: a frase original é condicional (só convoca se houver vaga). A reescritura removeu a condição e trocou \"somente\" por \"sempre\", mudando completamente o sentido.", peso:0.5},
+  {id:"q7", nivel:2, tipo:"certo_errado", original:"O servidor poderá ser exonerado a pedido, salvo se estiver respondendo a processo administrativo.", enunciado:"A reescritura \"O servidor poderá ser exonerado a pedido, ainda que esteja respondendo a processo administrativo\" preserva o sentido original.", gabarito:false, justificativa:"Errado: \"salvo se\" indica exceção (não pode se estiver respondendo processo); \"ainda que\" indica concessão (pode mesmo respondendo processo). São sentidos opostos.", peso:0.5},
+
+  // NÍVEL 3 - múltipla escolha estilo FGV
+  {id:"q8", nivel:3, tipo:"multipla",
+    enunciado:"Assinale a alternativa que reescreve a frase \"Não é a lei que garante direitos, mas sua aplicação correta que os efetiva\" sem alteração de sentido:",
+    alternativas:[
+      "A lei garante direitos, independentemente de sua aplicação.",
+      "Os direitos são garantidos pela lei, e não pela sua aplicação correta.",
+      "Quem efetiva os direitos é a aplicação correta da lei, não a lei em si.",
+      "A aplicação da lei é irrelevante para a garantia de direitos.",
+      "A lei e sua aplicação garantem direitos de forma equivalente."
+    ],
+    gabarito:2,
+    justificativa:"A original nega que a lei por si só garanta direitos, atribuindo esse papel à aplicação correta — exatamente o que a alternativa C reafirma.",
+    peso:1
+  }
+];
+
+const DEFAULT_GAME_PAIRS = [
+  {a:"Voz Passiva", b:"verbo ser/estar + particípio"},
+  {a:"Sujeito", b:"quem pratica ou sofre a ação"},
+  {a:"Agente da passiva", b:"quem pratica a ação na voz passiva"},
+  {a:"Equivalência", b:"mesmo sentido, forma diferente"},
+  {a:"Conectivo", b:"liga ideias e orações"},
+  {a:"Ambiguidade", b:"erro que gera duplo sentido"}
+];
+
+/* ============ ESTADO ============ */
+let state = {
+  admin: null,          // {username, passHash}
+  session: {isAdmin:false, entered:false},
+  progress: {salary:0, totalQuestions:0, acertos:0, streak:0, lastDate:null, energia:0},
+  questions: DEFAULT_QUESTIONS,
+  phrases: DEFAULT_PHRASES,
+  gamePairs: DEFAULT_GAME_PAIRS
+};
+let currentTab = "estudar";
+let currentLevel = 0;
+let qIndexByLevel = {0:0,1:0,2:0,3:0};
+let answered = false;
+
+/* ============ STORAGE HELPERS ============ */
+async function saveKey(key, value){
+  try{ await window.storage.set(key, JSON.stringify(value), false); }catch(e){ console.error("save fail", key, e); }
+}
+async function loadKey(key){
+  try{ const r = await window.storage.get(key, false); return r ? JSON.parse(r.value) : null; }catch(e){ return null; }
+}
+
+async function persistProgress(){ await saveKey('cz-progress', state.progress); }
+async function persistQuestions(){ await saveKey('cz-questions', state.questions); }
+async function persistPhrases(){ await saveKey('cz-phrases', state.phrases); }
+async function persistAdmin(){ await saveKey('cz-admin', state.admin); }
+
+/* ============ INIT ============ */
+async function init(){
+  const [admin, progress, questions, phrases] = await Promise.all([
+    loadKey('cz-admin'), loadKey('cz-progress'), loadKey('cz-questions'), loadKey('cz-phrases')
+  ]);
+  if(admin) state.admin = admin;
+  if(progress) state.progress = progress;
+  if(questions) state.questions = questions;
+  if(phrases) state.phrases = phrases;
+
+  applyDailyDecay();
+  renderGate();
+}
+
+function applyDailyDecay(){
+  const today = new Date().toDateString();
+  if(!state.progress.lastDate){ return; }
+  if(state.progress.lastDate === today) return;
+  const last = new Date(state.progress.lastDate);
+  const diffDays = Math.round((new Date(today) - last) / 86400000);
+  if(diffDays >= 2){
+    state.progress.salary = Math.max(0, state.progress.salary - (diffDays - 1));
+    state.progress.streak = 0;
+  }
+}
+
+/* ============ GATE (login/setup) ============ */
+function renderGate(){
+  const card = document.getElementById('gateCard');
+  if(!state.admin){
+    card.innerHTML = `
+      <h1>CONCURSO://ZERO</h1>
+      <p class="sub">Primeiro acesso. Crie seu login de ADM — só quem tiver essa senha edita conteúdo, questões e frases do app.</p>
+      <div class="field"><label>Nome</label><input id="setupName" placeholder="Maiko Gomes de Almeida"></div>
+      <div class="field"><label>Usuário ADM</label><input id="setupUser" placeholder="ex: maiko"></div>
+      <div class="field"><label>Senha ADM</label><input id="setupPass" type="password" placeholder="crie uma senha"></div>
+      <button class="btn btn-primary" onclick="doSetup()">Criar acesso ADM</button>
+      <div class="gate-msg" id="gateMsg"></div>
+      <div class="gate-switch"><em>Obs: essa senha fica só neste dispositivo/artefato — pra um app publicado de verdade, precisa de autenticação real no backend.</em></div>
+    `;
+  } else {
+    card.innerHTML = `
+      <h1>CONCURSO://ZERO</h1>
+      <p class="sub">Bem-vindo de volta. Entre como ADM pra editar conteúdo, ou entre como usuário pra só estudar.</p>
+      <div class="field"><label>Usuário</label><input id="loginUser" placeholder="usuário ADM"></div>
+      <div class="field"><label>Senha</label><input id="loginPass" type="password" placeholder="senha"></div>
+      <button class="btn btn-primary" onclick="doLogin(true)">Entrar como ADM</button>
+      <button class="btn btn-ghost" onclick="doLogin(false)">Entrar só pra estudar</button>
+      <div class="gate-msg" id="gateMsg"></div>
+    `;
+  }
+}
+
+function simpleHash(str){ return btoa(unescape(encodeURIComponent(str))); }
+
+async function doSetup(){
+  const name = document.getElementById('setupName').value.trim();
+  const user = document.getElementById('setupUser').value.trim();
+  const pass = document.getElementById('setupPass').value;
+  if(!user || !pass){ document.getElementById('gateMsg').textContent = "Preenche usuário e senha."; return; }
+  state.admin = {name: name || "Maiko Gomes de Almeida", username:user, passHash: simpleHash(pass)};
+  await persistAdmin();
+  state.session = {isAdmin:true, entered:true};
+  state.progress.candidateName = name || "Maiko Gomes de Almeida";
+  enterApp();
+}
+
+async function doLogin(asAdmin){
+  if(!asAdmin){
+    state.session = {isAdmin:false, entered:true};
+    enterApp();
+    return;
+  }
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  if(user === state.admin.username && simpleHash(pass) === state.admin.passHash){
+    state.session = {isAdmin:true, entered:true};
+    enterApp();
+  } else {
+    document.getElementById('gateMsg').textContent = "Usuário ou senha errados.";
+  }
+}
+
+function enterApp(){
+  document.getElementById('gate').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  renderTabs();
+  renderShell();
+  renderTab();
+}
+
+/* ============ SHELL (payslip + motivation) ============ */
+function currentTierTitle(){
+  const total = state.progress.totalQuestions;
+  const found = LEVEL_LABELS.find(l => total >= l.min && total <= l.max);
+  return found ? found.title : "LASCADO";
+}
+
+function currentMotivation(){
+  const s = state.progress.salary;
+  if(s === 0) return state.phrases.start;
+  let msg = state.phrases.daily;
+  for(const t of state.phrases.tiers){
+    if(s >= t.at) msg = t.msg;
+  }
+  return msg;
+}
+
+function renderShell(){
+  document.getElementById('payslipDate').textContent = new Date().toLocaleDateString('pt-BR');
+  document.getElementById('payslipName').textContent = (state.admin && state.admin.name) || "Candidato(a)";
+  document.getElementById('salaryValue').textContent = 'R$ ' + state.progress.salary.toFixed(2).replace('.', ',');
+  document.getElementById('statQuestions').textContent = state.progress.totalQuestions;
+  const pct = state.progress.totalQuestions > 0 ? Math.round((state.progress.acertos/state.progress.totalQuestions)*100) : 0;
+  document.getElementById('statAcertos').textContent = pct + '%';
+  document.getElementById('statEnergia').textContent = state.progress.energia;
+  document.getElementById('stampBadge').textContent = currentTierTitle();
+  document.getElementById('streakDisplay').textContent = '🔥 ' + state.progress.streak + ' dias';
+  document.getElementById('motivationBox').textContent = currentMotivation();
+}
+
+/* ============ TABS ============ */
+function renderTabs(){
+  const bar = document.getElementById('tabBar');
+  const tabs = [
+    {id:'estudar', label:'Estudar'},
+    {id:'jogo', label:'Jogo'},
+    {id:'extrato', label:'Extrato'}
+  ];
+  if(state.session.isAdmin) tabs.push({id:'admin', label:'ADM'});
+  bar.innerHTML = tabs.map(t => `<div class="tab ${currentTab===t.id?'active':''}" onclick="switchTab('${t.id}')">${t.label}</div>`).join('');
+}
+
+function switchTab(id){ currentTab = id; renderTabs(); renderTab(); }
+
+function renderTab(){
+  const el = document.getElementById('tabContent');
+  if(currentTab === 'estudar') el.innerHTML = estudarHTML();
+  else if(currentTab === 'jogo') el.innerHTML = jogoHTML();
+  else if(currentTab === 'extrato') el.innerHTML = extratoHTML();
+  else if(currentTab === 'admin') el.innerHTML = adminHTML();
+  if(currentTab === 'jogo') initGame();
+}
+
+/* ============ ESTUDAR (Kumon 4 níveis) ============ */
+const LEVEL_META = [
+  {n:0, label:"Nível 0", sub:"Aquecimento"},
+  {n:1, label:"Nível 1", sub:"Literal"},
+  {n:2, label:"Nível 2", sub:"Pegadinha"},
+  {n:3, label:"Nível 3", sub:"Prova real"}
+];
+
+function questionsForLevel(n){ return state.questions.filter(q => q.nivel === n); }
+
+function estudarHTML(){
+  const qs = questionsForLevel(currentLevel);
+  const idx = qIndexByLevel[currentLevel] % (qs.length || 1);
+  const q = qs[idx];
+
+  let levelRow = `<div class="level-row">` + LEVEL_META.map(l =>
+    `<div class="lvl ${currentLevel===l.n?'active':''}" onclick="setLevel(${l.n})">${l.label}<small>${l.sub}</small></div>`
+  ).join('') + `</div>`;
+
+  if(!q) return `<div class="card"><div class="section-title">Reescritura de texto</div>${levelRow}<p style="color:var(--dim); font-size:13px;">Sem questões nesse nível ainda. Adicione pelo painel ADM.</p></div>`;
+
+  let body = '';
+  if(q.tipo === 'flash'){
+    body = flashHTML(q);
+  } else if(q.tipo === 'certo_errado'){
+    body = certoErradoHTML(q);
+  } else if(q.tipo === 'multipla'){
+    body = multiplaHTML(q);
+  }
+
+  return `<div class="card">
+    <div class="section-title">Reescritura de texto (equivalência de frases)</div>
+    ${levelRow}
+    ${body}
+  </div>`;
+}
+
+function setLevel(n){ currentLevel = n; answered = false; renderTab(); }
+
+function flashHTML(q){
+  return `
+    <div class="q-enunciado">${q.enunciado}</div>
+    <input id="flashInput" placeholder="Digite a palavra que falta" style="width:100%; background:var(--panel2); border:1px solid var(--line); color:var(--text); padding:11px; border-radius:3px; font-family:inherit; margin-bottom:10px;">
+    <button class="btn btn-primary" onclick="checkFlash('${q.id}')">Responder</button>
+    <div id="fb"></div>
+  `;
+}
+function checkFlash(id){
+  const q = state.questions.find(x=>x.id===id);
+  const val = document.getElementById('flashInput').value.trim().toLowerCase();
+  const correct = q.resposta.toLowerCase().split('/').some(opt => val.includes(opt.trim().split(' ')[0]));
+  registerAnswer(q, correct);
+  document.getElementById('fb').innerHTML = feedbackHTML(correct, `Resposta esperada: ${q.resposta}`);
+}
+
+function certoErradoHTML(q){
+  return `
+    <div class="q-original">"${q.original}"</div>
+    <div class="q-enunciado">${q.enunciado}</div>
+    <div class="opt-list">
+      <button class="opt" onclick="checkCE('${q.id}', true, this)">CERTO</button>
+      <button class="opt" onclick="checkCE('${q.id}', false, this)">ERRADO</button>
+    </div>
+    <div id="fb"></div>
+  `;
+}
+function checkCE(id, chosen, btn){
+  if(answered) return;
+  const q = state.questions.find(x=>x.id===id);
+  const correct = chosen === q.gabarito;
+  answered = true;
+  btn.classList.add(correct ? 'correct' : 'wrong');
+  registerAnswer(q, correct);
+  document.getElementById('fb').innerHTML = feedbackHTML(correct, q.justificativa);
+}
+
+function multiplaHTML(q){
+  return `
+    <div class="q-enunciado">${q.enunciado}</div>
+    <div class="opt-list">
+      ${q.alternativas.map((alt,i)=>`<button class="opt" onclick="checkMulti('${q.id}', ${i}, this)">${String.fromCharCode(65+i)}) ${alt}</button>`).join('')}
+    </div>
+    <div id="fb"></div>
+  `;
+}
+function checkMulti(id, chosenIdx, btn){
+  if(answered) return;
+  const q = state.questions.find(x=>x.id===id);
+  const correct = chosenIdx === q.gabarito;
+  answered = true;
+  btn.classList.add(correct ? 'correct' : 'wrong');
+  registerAnswer(q, correct);
+  document.getElementById('fb').innerHTML = feedbackHTML(correct, q.justificativa);
+}
+
+function feedbackHTML(correct, text){
+  return `<div class="feedback ${correct?'ok':'bad'}">${correct?'✔ Acertou.':'✘ Errou.'} ${text}
+    <div class="next-btn"><button class="btn btn-ghost" onclick="nextQuestion()">Próxima questão</button></div>
+  </div>`;
+}
+
+function nextQuestion(){
+  const qs = questionsForLevel(currentLevel);
+  qIndexByLevel[currentLevel] = (qIndexByLevel[currentLevel] + 1) % (qs.length || 1);
+  answered = false;
+  renderTab();
+}
+
+function registerAnswer(q, correct){
+  const today = new Date().toDateString();
+  if(state.progress.lastDate !== today){
+    state.progress.streak += 1;
+    state.progress.lastDate = today;
+    state.progress.salary += 1; // dia estudado soma 1
+  }
+  state.progress.totalQuestions += 1;
+  if(correct){
+    state.progress.acertos += 1;
+    state.progress.salary += q.peso;
+  } else {
+    state.progress.salary = Math.max(0, state.progress.salary - q.peso);
+  }
+  if(state.progress.totalQuestions % 100 === 0){
+    state.progress.salary += 10; // bônus a cada 100 questões
+  }
+  persistProgress();
+  renderShell();
+  renderTabs();
+}
+
+/* ============ JOGO (memória) ============ */
+let gameCards = [];
+let flippedIndices = [];
+let lockBoard = false;
+
+function jogoHTML(){
+  return `<div class="card">
+    <div class="section-title">Jogo da Memória — Reescritura</div>
+    <p style="font-size:12.5px; color:var(--dim); margin-bottom:12px;">Pareie o termo com a definição. Completar dá energia (não mexe no salário).</p>
+    <div class="grid" id="memGrid"></div>
+    <div id="gameMsg" style="margin-top:10px; font-size:12.5px; color:var(--green);"></div>
+  </div>`;
+}
+
+function initGame(){
+  const pairs = state.gamePairs;
+  let deck = [];
+  pairs.forEach((p, i) => {
+    deck.push({key:i, text:p.a, type:'a'});
+    deck.push({key:i, text:p.b, type:'b'});
+  });
+  deck.sort(() => Math.random() - 0.5);
+  gameCards = deck.map(d => ({...d, flipped:false, matched:false}));
+  flippedIndices = [];
+  lockBoard = false;
+  renderGrid();
+}
+
+function renderGrid(){
+  const grid = document.getElementById('memGrid');
+  if(!grid) return;
+  grid.innerHTML = gameCards.map((c, i) => {
+    const cls = c.matched ? 'matched' : (c.flipped ? 'flipped' : 'hidden-face');
+    const label = (c.matched || c.flipped) ? c.text : '?';
+    return `<div class="mcard ${cls}" onclick="flipCard(${i})">${label}</div>`;
+  }).join('');
+}
+
+function flipCard(i){
+  if(lockBoard || gameCards[i].flipped || gameCards[i].matched) return;
+  gameCards[i].flipped = true;
+  flippedIndices.push(i);
+  renderGrid();
+  if(flippedIndices.length === 2){
+    lockBoard = true;
+    const [a,b] = flippedIndices;
+    if(gameCards[a].key === gameCards[b].key && gameCards[a].type !== gameCards[b].type){
+      gameCards[a].matched = true; gameCards[b].matched = true;
+      flippedIndices = []; lockBoard = false;
+      renderGrid();
+      checkGameWin();
+    } else {
+      setTimeout(() => {
+        gameCards[a].flipped = false; gameCards[b].flipped = false;
+        flippedIndices = []; lockBoard = false;
+        renderGrid();
+      }, 800);
+    }
+  }
+}
+
+function checkGameWin(){
+  if(gameCards.every(c => c.matched)){
+    state.progress.energia += 5;
+    persistProgress();
+    renderShell();
+    document.getElementById('gameMsg').textContent = "Completou! +5 de energia. Bora de novo?";
+  }
+}
+
+/* ============ EXTRATO ============ */
+function extratoHTML(){
+  return `<div class="card">
+    <div class="section-title">Extrato</div>
+    <div class="qlist-item"><div class="meta">RESUMO GERAL</div>
+      Total de questões respondidas: <strong>${state.progress.totalQuestions}</strong><br>
+      Acertos: <strong>${state.progress.acertos}</strong><br>
+      Salário acumulado: <strong>R$ ${state.progress.salary.toFixed(2).replace('.',',')}</strong><br>
+      Sequência atual: <strong>${state.progress.streak} dias</strong><br>
+      Energia (jogo): <strong>${state.progress.energia}</strong>
+    </div>
+    <p style="font-size:11.5px; color:var(--dim); margin-top:10px;">Meta final: 15.000 questões pra virar "VOCÊ ZEROU A VIDA".</p>
+  </div>`;
+}
+
+/* ============ ADMIN ============ */
+function adminHTML(){
+  return `
+  <div class="card">
+    <div class="section-title">Adicionar questão</div>
+    <select id="admNivel">
+      <option value="0">Nível 0 — Aquecimento (flash)</option>
+      <option value="1">Nível 1 — Certo/Errado literal</option>
+      <option value="2">Nível 2 — Certo/Errado pegadinha</option>
+      <option value="3">Nível 3 — Múltipla escolha (prova)</option>
+    </select>
+    <select id="admTipo" onchange="renderAdminFields()">
+      <option value="flash">Flashcard (completar)</option>
+      <option value="certo_errado">Certo/Errado</option>
+      <option value="multipla">Múltipla escolha</option>
+    </select>
+    <div id="admFields"></div>
+    <button class="btn btn-primary" onclick="addQuestion()">Salvar questão</button>
+  </div>
+  <div class="card">
+    <div class="section-title">Questões cadastradas (${state.questions.length})</div>
+    ${state.questions.map(q => `
+      <div class="qlist-item">
+        <div class="meta">Nível ${q.nivel} · ${q.tipo}</div>
+        ${q.enunciado}
+        <div class="row-btns"><button onclick="deleteQuestion('${q.id}')">Excluir</button></div>
+      </div>`).join('')}
+  </div>
+  <div class="card">
+    <div class="section-title">Frases motivacionais</div>
+    <label style="font-size:11px; color:var(--dim);">Frase de início (salário zero)</label>
+    <textarea id="admPhraseStart" rows="2">${state.phrases.start}</textarea>
+    <label style="font-size:11px; color:var(--dim); margin-top:8px; display:block;">Frase diária padrão</label>
+    <textarea id="admPhraseDaily" rows="2">${state.phrases.daily}</textarea>
+    <button class="btn btn-ghost" style="margin-top:10px;" onclick="savePhrases()">Salvar frases</button>
+  </div>
+  <div class="card">
+    <div class="section-title">Zona de risco</div>
+    <button class="btn btn-danger" onclick="resetProgress()">Zerar progresso (salário, questões, streak)</button>
+  </div>
+  `;
+}
+
+function renderAdminFields(){
+  const tipo = document.getElementById('admTipo').value;
+  const el = document.getElementById('admFields');
+  if(tipo === 'flash'){
+    el.innerHTML = `
+      <div class="field"><label>Enunciado (use ___ pro espaço)</label><textarea id="fEnunciado" rows="2"></textarea></div>
+      <div class="field"><label>Resposta esperada</label><input id="fResposta"></div>
+    `;
+  } else if(tipo === 'certo_errado'){
+    el.innerHTML = `
+      <div class="field"><label>Frase original</label><textarea id="fOriginal" rows="2"></textarea></div>
+      <div class="field"><label>Reescritura proposta (enunciado)</label><textarea id="fEnunciado" rows="2"></textarea></div>
+      <div class="field"><label>Gabarito</label>
+        <select id="fGabarito"><option value="true">Certo</option><option value="false">Errado</option></select>
+      </div>
+      <div class="field"><label>Justificativa</label><textarea id="fJustificativa" rows="2"></textarea></div>
+    `;
+  } else {
+    el.innerHTML = `
+      <div class="field"><label>Enunciado</label><textarea id="fEnunciado" rows="2"></textarea></div>
+      <div class="field"><label>Alternativas (uma por linha, 5 linhas)</label><textarea id="fAlternativas" rows="5"></textarea></div>
+      <div class="field"><label>Índice da correta (0=A, 1=B...)</label><input id="fGabaritoIdx" type="number" min="0" max="4"></div>
+      <div class="field"><label>Justificativa</label><textarea id="fJustificativa" rows="2"></textarea></div>
+    `;
+  }
+}
+
+function addQuestion(){
+  const nivel = parseInt(document.getElementById('admNivel').value);
+  const tipo = document.getElementById('admTipo').value;
+  const id = 'q' + Date.now();
+  let q = {id, nivel, tipo, peso: nivel===0?0.2:(nivel===3?1:0.5)};
+  if(tipo === 'flash'){
+    q.enunciado = document.getElementById('fEnunciado').value;
+    q.resposta = document.getElementById('fResposta').value;
+  } else if(tipo === 'certo_errado'){
+    q.original = document.getElementById('fOriginal').value;
+    q.enunciado = document.getElementById('fEnunciado').value;
+    q.gabarito = document.getElementById('fGabarito').value === 'true';
+    q.justificativa = document.getElementById('fJustificativa').value;
+  } else {
+    q.enunciado = document.getElementById('fEnunciado').value;
+    q.alternativas = document.getElementById('fAlternativas').value.split('\n').filter(x=>x.trim());
+    q.gabarito = parseInt(document.getElementById('fGabaritoIdx').value);
+    q.justificativa = document.getElementById('fJustificativa').value;
+  }
+  state.questions.push(q);
+  persistQuestions();
+  renderTab();
+}
+
+function deleteQuestion(id){
+  state.questions = state.questions.filter(q => q.id !== id);
+  persistQuestions();
+  renderTab();
+}
+
+function savePhrases(){
+  state.phrases.start = document.getElementById('admPhraseStart').value;
+  state.phrases.daily = document.getElementById('admPhraseDaily').value;
+  persistPhrases();
+  renderShell();
+  alert('Frases salvas.');
+}
+
+function resetProgress(){
+  if(!confirm('Tem certeza? Isso zera salário, questões e streak.')) return;
+  state.progress = {salary:0, totalQuestions:0, acertos:0, streak:0, lastDate:null, energia:0};
+  persistProgress();
+  renderShell();
+  renderTab();
+}
+
+/* boot */
+document.addEventListener('DOMContentLoaded', () => { renderAdminFields(); });
+init();
+window.setLevel = setLevel;
+window.switchTab = switchTab;
+window.checkFlash = checkFlash;
+window.checkCE = checkCE;
+window.checkMulti = checkMulti;
+window.nextQuestion = nextQuestion;
+window.flipCard = flipCard;
+window.deleteQuestion = deleteQuestion;
+window.addQuestion = addQuestion;
+window.savePhrases = savePhrases;
+window.resetProgress = resetProgress;
+window.renderAdminFields = renderAdminFields;
+window.doSetup = doSetup;
+window.doLogin = doLogin;
+</script>
+</body>
+</html>
